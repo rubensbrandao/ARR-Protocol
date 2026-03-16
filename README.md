@@ -1,0 +1,2 @@
+# arc-money
+ARC testnet

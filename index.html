@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Mini dApp Staking - Arc Testnet</title>
-  <!-- ethers.js v5 para navegador -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <!-- ethers.js UMD v5 -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 </head>
 <body>
   <h2>Mini dApp Staking - Arc Testnet</h2>
@@ -19,7 +19,10 @@
     let signer;
     let contract;
 
+    // Coloque o endereço do seu contrato aqui
     const contractAddress = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838"; 
+
+    // ABI mínima do contrato para stake, withdraw e getStake
     const abi = [
       {
         "inputs": [],
@@ -50,9 +53,11 @@
     const balanceText = document.getElementById("balance");
 
     async function connectWallet() {
-      if (window.ethereum) {
+      if (window.ethereum && window.ethers) {
         try {
           await window.ethereum.request({ method: "eth_requestAccounts" });
+
+          // Conecta via ethers v5 UMD
           provider = new ethers.providers.Web3Provider(window.ethereum);
           signer = provider.getSigner();
           contract = new ethers.Contract(contractAddress, abi, signer);
@@ -66,7 +71,7 @@
           alert("Erro ao conectar MetaMask: " + err.message);
         }
       } else {
-        alert("MetaMask não encontrada! Instale a extensão e tente novamente.");
+        alert("MetaMask ou ethers.js não encontrados! Instale a extensão e tente novamente.");
       }
     }
 

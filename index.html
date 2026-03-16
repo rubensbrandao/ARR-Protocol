@@ -175,8 +175,8 @@
 
     .banner{
       position:relative;
-      width:200%;
-      height:1200px;
+      width:100%;
+      height:240px;
       border-radius:22px;
       overflow:hidden;
       background:#ddd;
@@ -409,7 +409,7 @@
       color:var(--gold-dark);
     }
 
-    @media (max-width:1200px){
+    @media (max-width:1080px){
       .grid{
         grid-template-columns:1fr;
       }
@@ -490,7 +490,6 @@
     </div>
 
     <div class="grid">
-      <!-- SWAP -->
       <div class="card">
         <h2>Swap</h2>
         <div class="card-sub">Choose the input and output token for your swap.</div>
@@ -544,7 +543,6 @@
         <div class="status" id="swapStatus">Connect your wallet to begin.</div>
       </div>
 
-      <!-- POOL -->
       <div class="card">
         <h2>Liquidity Pool</h2>
         <div class="card-sub">Deposit token pairs and select the fee tier.</div>
@@ -594,7 +592,6 @@
         <div class="status" id="poolStatus">Pool logic will be connected after swap implementation.</div>
       </div>
 
-      <!-- STAKE -->
       <div class="card">
         <h2>Stake</h2>
         <div class="card-sub">Stake tokens and receive part of protocol fees.</div>

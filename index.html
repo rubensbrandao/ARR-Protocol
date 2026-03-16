@@ -37,19 +37,36 @@
 
     const CONTRACT_ADDRESS = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838";
     const ABI = [
-      { "inputs": [], "name": "getStake", "outputs": [{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
-      { "inputs": [], "name": "stake", "outputs": [], "stateMutability": "payable", "type":"function" },
-      { "inputs": [], "name": "withdraw", "outputs": [], "stateMutability":"nonpayable", "type":"function" }
+      {
+        "inputs":[{"internalType":"address","name":"_owner","type":"address"}],
+        "name":"balanceOf",
+        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+        "stateMutability":"view",
+        "type":"function"
+      },
+      {
+        "inputs":[],
+        "name":"stake",
+        "outputs":[],
+        "stateMutability":"payable",
+        "type":"function"
+      },
+      {
+        "inputs":[],
+        "name":"withdraw",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+      }
     ];
 
-    async function updateBalance(contract) {
+    async function updateBalance(contract, signerAddress) {
       try {
-        const stake = await contract.getStake();
+        const stake = await contract.balanceOf(signerAddress);
         const eth = ethers.utils.formatEther(stake);
         balanceText.innerText = `Saldo: ${eth} ETH`;
-        // Simulação conversão para USDC/USDE
-        const USDC_RATE = 1; // 1 ETH = 1 USDC (teste)
-        const USDE_RATE = 1.05; // 1 ETH = 1.05 USDE (teste)
+        const USDC_RATE = 1;   // ajustar conforme preço real
+        const USDE_RATE = 1.05; // ajustar conforme preço real
         balanceUSDCText.innerText = `Saldo: ${(parseFloat(eth)*USDC_RATE).toFixed(4)} USDC`;
         balanceUSDEText.innerText = `Saldo: ${(parseFloat(eth)*USDE_RATE).toFixed(4)} USDE`;
       } catch(err) {
@@ -82,7 +99,7 @@
         stakeButton.disabled = false;
         withdrawButton.disabled = false;
 
-        await updateBalance(contract);
+        await updateBalance(contract, address);
 
         stakeButton.onclick = async () => {
           try {
@@ -90,7 +107,7 @@
             const tx = await contract.stake({ value: ethers.utils.parseEther("0.001") });
             await tx.wait();
             statusText.innerText = "Stake concluído!";
-            await updateBalance(contract);
+            await updateBalance(contract, address);
           } catch(err) {
             statusText.innerText = "Erro no stake: " + err.message;
           }
@@ -102,7 +119,7 @@
             const tx = await contract.withdraw();
             await tx.wait();
             statusText.innerText = "Withdraw concluído!";
-            await updateBalance(contract);
+            await updateBalance(contract, address);
           } catch(err) {
             statusText.innerText = "Erro no withdraw: " + err.message;
           }

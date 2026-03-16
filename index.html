@@ -2,132 +2,118 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>dApp Staking - Arc Testnet V2</title>
+  <title>Counter dApp - Arc Testnet</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
     button { margin: 5px; padding: 10px 15px; font-size: 16px; }
+    input { padding: 5px; font-size: 14px; width: 100px; }
     p { font-size: 16px; }
     #status { color: green; }
   </style>
 </head>
 <body>
-  <h2>dApp Staking - Arc Testnet V2</h2>
+  <h2>Counter dApp - Arc Testnet</h2>
   <button id="connectWallet">Conectar Carteira</button>
   <p id="walletAddress">Endereço: (aguardando conexão...)</p>
-  <button id="stakeButton" disabled>Stake 0.001 ETH</button>
-  <button id="withdrawButton" disabled>Withdraw</button>
-  <p id="balance">Saldo: 0 ETH</p>
-  <p id="balanceUSDC">Saldo: 0 USDC</p>
-  <p id="balanceUSDE">Saldo: 0 USDE</p>
+
+  <p>Number atual: <span id="number">0</span></p>
+  <input type="number" id="newNumber" placeholder="Novo número">
+  <button id="setNumberButton" disabled>Set Number</button>
+  <button id="incrementButton" disabled>Increment</button>
+
+  <h3>Saldo do contrato (ETH)</h3>
+  <p id="contractBalance">0 ETH</p>
+  <input type="number" id="depositAmount" placeholder="ETH para depositar">
+  <button id="depositButton" disabled>Depositar ETH</button>
+
   <p id="status"></p>
 
   <script>
     const connectButton = document.getElementById("connectWallet");
     const walletAddress = document.getElementById("walletAddress");
-    const stakeButton = document.getElementById("stakeButton");
-    const withdrawButton = document.getElementById("withdrawButton");
-    const balanceText = document.getElementById("balance");
-    const balanceUSDCText = document.getElementById("balanceUSDC");
-    const balanceUSDEText = document.getElementById("balanceUSDE");
+    const numberText = document.getElementById("number");
+    const newNumberInput = document.getElementById("newNumber");
+    const setNumberButton = document.getElementById("setNumberButton");
+    const incrementButton = document.getElementById("incrementButton");
+    const contractBalanceText = document.getElementById("contractBalance");
+    const depositInput = document.getElementById("depositAmount");
+    const depositButton = document.getElementById("depositButton");
     const statusText = document.getElementById("status");
 
-    stakeButton.disabled = true;
-    withdrawButton.disabled = true;
+    const CONTRACT_ADDRESS = "0x70581DF0efd24AeA5ECaea97C2f7C7935bf59549";
 
-    const CONTRACT_ADDRESS = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838";
     const ABI = [
-      {
-        "inputs":[{"internalType":"address","name":"_owner","type":"address"}],
-        "name":"balanceOf",
-        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
-        "stateMutability":"view",
-        "type":"function"
-      },
-      {
-        "inputs":[],
-        "name":"stake",
-        "outputs":[],
-        "stateMutability":"payable",
-        "type":"function"
-      },
-      {
-        "inputs":[],
-        "name":"withdraw",
-        "outputs":[],
-        "stateMutability":"nonpayable",
-        "type":"function"
-      }
+      { "inputs": [], "name": "number", "outputs": [{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
+      { "inputs": [{"internalType":"uint256","name":"newNumber","type":"uint256"}], "name":"setNumber", "outputs": [], "stateMutability":"nonpayable", "type":"function" },
+      { "inputs": [], "name": "increment", "outputs": [], "stateMutability":"nonpayable", "type":"function" },
+      { "inputs": [], "name": "getBalance", "outputs": [{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" }
     ];
 
-    async function updateBalance(contract, signerAddress) {
-      try {
-        const stake = await contract.balanceOf(signerAddress);
-        const eth = ethers.utils.formatEther(stake);
-        balanceText.innerText = `Saldo: ${eth} ETH`;
-        const USDC_RATE = 1;   // ajustar conforme preço real
-        const USDE_RATE = 1.05; // ajustar conforme preço real
-        balanceUSDCText.innerText = `Saldo: ${(parseFloat(eth)*USDC_RATE).toFixed(4)} USDC`;
-        balanceUSDEText.innerText = `Saldo: ${(parseFloat(eth)*USDE_RATE).toFixed(4)} USDE`;
-      } catch(err) {
-        balanceText.innerText = "Saldo: erro ao ler";
-        balanceUSDCText.innerText = "Saldo: erro ao ler";
-        balanceUSDEText.innerText = "Saldo: erro ao ler";
-        console.error("Erro ao ler saldo:", err);
-      }
+    let contract;
+    let signer;
+
+    async function updateNumber() {
+      const value = await contract.number();
+      numberText.innerText = value.toString();
+    }
+
+    async function updateContractBalance() {
+      const balance = await contract.getBalance();
+      contractBalanceText.innerText = ethers.utils.formatEther(balance) + " ETH";
     }
 
     connectButton.onclick = async () => {
+      if (!window.ethereum) return alert("MetaMask não encontrada!");
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      const address = await signer.getAddress();
+      walletAddress.innerText = "Conectado: " + address;
+
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      setNumberButton.disabled = false;
+      incrementButton.disabled = false;
+      depositButton.disabled = false;
+
+      await updateNumber();
+      await updateContractBalance();
+    };
+
+    setNumberButton.onclick = async () => {
+      const newValue = newNumberInput.value;
+      if (!newValue) return alert("Digite um número!");
+      statusText.innerText = "Atualizando número...";
+      const tx = await contract.setNumber(newValue);
+      await tx.wait();
+      await updateNumber();
+      statusText.innerText = "Número atualizado!";
+    };
+
+    incrementButton.onclick = async () => {
+      statusText.innerText = "Incrementando número...";
+      const tx = await contract.increment();
+      await tx.wait();
+      await updateNumber();
+      statusText.innerText = "Número incrementado!";
+    };
+
+    depositButton.onclick = async () => {
+      const amount = depositInput.value;
+      if (!amount) return alert("Digite o valor de ETH!");
+      statusText.innerText = "Depositando ETH...";
       try {
-        if (!window.ethereum) {
-          walletAddress.innerText = "MetaMask não encontrada!";
-          return;
-        }
-
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        walletAddress.innerText = "Conectado: " + address;
-
-        const network = await provider.getNetwork();
-        console.log("Rede atual:", network);
-
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-
-        stakeButton.disabled = false;
-        withdrawButton.disabled = false;
-
-        await updateBalance(contract, address);
-
-        stakeButton.onclick = async () => {
-          try {
-            statusText.innerText = "Staking...";
-            const tx = await contract.stake({ value: ethers.utils.parseEther("0.001") });
-            await tx.wait();
-            statusText.innerText = "Stake concluído!";
-            await updateBalance(contract, address);
-          } catch(err) {
-            statusText.innerText = "Erro no stake: " + err.message;
-          }
-        };
-
-        withdrawButton.onclick = async () => {
-          try {
-            statusText.innerText = "Withdraw em progresso...";
-            const tx = await contract.withdraw();
-            await tx.wait();
-            statusText.innerText = "Withdraw concluído!";
-            await updateBalance(contract, address);
-          } catch(err) {
-            statusText.innerText = "Erro no withdraw: " + err.message;
-          }
-        };
-
+        const tx = await signer.sendTransaction({
+          to: CONTRACT_ADDRESS,
+          value: ethers.utils.parseEther(amount)
+        });
+        await tx.wait();
+        await updateContractBalance();
+        statusText.innerText = "ETH depositado com sucesso!";
       } catch(err) {
-        walletAddress.innerText = "Erro ao conectar MetaMask: " + err.message;
-        console.error(err);
+        statusText.innerText = "Erro no depósito: " + err.message;
       }
     };
   </script>

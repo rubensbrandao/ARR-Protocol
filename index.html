@@ -2,111 +2,36 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Mini dApp Staking - Arc Testnet</title>
-  <!-- ethers.js UMD v5 -->
+  <title>Conectar Carteira na Arc</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 </head>
 <body>
-  <h2>Mini dApp Staking - Arc Testnet</h2>
-
-  <button id="connectWallet">Conectar Carteira</button>
-  <button id="stakeButton" disabled>Stake 0.001 ETH</button>
-  <button id="withdrawButton" disabled>Withdraw</button>
-  <p id="balance">Saldo: 0</p>
+  <h2>Conectar Carteira na Arc Testnet</h2>
+  <button id="connectButton">Conectar Carteira</button>
+  <p id="walletAddress">Endereço: (aguardando conexão...)</p>
 
   <script>
-    let provider;
-    let signer;
-    let contract;
+    const connectButton = document.getElementById('connectButton');
+    const walletAddress = document.getElementById('walletAddress');
 
-    // Endereço do seu contrato
-    const contractAddress = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838";
-
-    // ABI mínima necessária
-    const abi = [
-      {
-        "inputs": [],
-        "name": "stake",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "withdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "getStake",
-        "outputs": [{"internalType":"uint256","name":"","type":"uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ];
-
-    const connectButton = document.getElementById("connectWallet");
-    const stakeButton = document.getElementById("stakeButton");
-    const withdrawButton = document.getElementById("withdrawButton");
-    const balanceText = document.getElementById("balance");
-
-    async function connectWallet() {
-      if (window.ethereum && window.ethers) {
+    connectButton.onclick = async () => {
+      if (window.ethereum) {
         try {
-          await window.ethereum.request({ method: "eth_requestAccounts" });
+          // Solicita acesso às contas
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
 
-          provider = new ethers.providers.Web3Provider(window.ethereum);
-          signer = provider.getSigner();
-          contract = new ethers.Contract(contractAddress, abi, signer);
-
-          connectButton.disabled = true;
-          stakeButton.disabled = false;
-          withdrawButton.disabled = false;
-
-          updateBalance();
+          walletAddress.innerText = 'Endereço: ' + address;
         } catch (err) {
-          alert("Erro ao conectar MetaMask: " + err.message);
+          walletAddress.innerText = 'Erro ao conectar: ' + err.message;
+          console.error(err);
         }
       } else {
-        alert("MetaMask ou ethers.js não encontrados! Instale a extensão e tente novamente.");
+        walletAddress.innerText = 'MetaMask não encontrada. Instale a extensão.';
       }
-    }
-
-    async function stake() {
-      try {
-        const tx = await contract.stake({ value: ethers.utils.parseEther("0.001") });
-        await tx.wait();
-        updateBalance();
-      } catch (err) {
-        alert("Erro ao fazer stake: " + err.message);
-      }
-    }
-
-    async function withdraw() {
-      try {
-        const tx = await contract.withdraw();
-        await tx.wait();
-        updateBalance();
-      } catch (err) {
-        alert("Erro ao fazer withdraw: " + err.message);
-      }
-    }
-
-    async function updateBalance() {
-      try {
-        const balance = await contract.getStake();
-        balanceText.innerText = "Saldo: " + ethers.utils.formatEther(balance) + " ETH";
-      } catch (err) {
-        balanceText.innerText = "Saldo: erro ao ler";
-        console.error("Erro ao ler saldo:", err);
-      }
-    }
-
-    connectButton.onclick = connectWallet;
-    stakeButton.onclick = stake;
-    withdrawButton.onclick = withdraw;
+    };
   </script>
 </body>
 </html>

@@ -8,120 +8,109 @@
 </head>
 <body>
   <h2>Mini dApp Staking - Arc Testnet</h2>
-
   <button id="connectWallet">Conectar Carteira</button>
   <p id="walletAddress">Endereço: (aguardando conexão...)</p>
-
   <button id="stakeButton" disabled>Stake 0.001 ETH</button>
   <button id="withdrawButton" disabled>Withdraw</button>
   <p id="balance">Saldo: 0</p>
 
   <script>
-    let provider;
-    let signer;
-    let contract;
-
-    const contractAddress = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838";
-
-    // ABI mínima
-    const abi = [
-      {
-        "inputs": [],
-        "name": "stake",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "withdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "getStake",
-        "outputs": [{"internalType":"uint256","name":"","type":"uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ];
-
+    // ======= Código que você colaria no console, adaptado para HTML =======
     const connectButton = document.getElementById("connectWallet");
     const walletAddress = document.getElementById("walletAddress");
     const stakeButton = document.getElementById("stakeButton");
     const withdrawButton = document.getElementById("withdrawButton");
     const balanceText = document.getElementById("balance");
 
-    // Desabilita os botões inicialmente
     stakeButton.disabled = true;
     withdrawButton.disabled = true;
 
-    async function connectWallet() {
-      if (!window.ethereum || !window.ethers) {
-        walletAddress.innerText = "MetaMask ou ethers.js não encontrados!";
-        return;
-      }
-
+    connectButton.onclick = async () => {
       try {
-        // Solicita conexão à carteira
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        const address = await signer.getAddress();
+        if (!window.ethereum) {
+          walletAddress.innerText = "MetaMask não encontrada!";
+          return;
+        }
 
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
         walletAddress.innerText = "Conectado: " + address;
 
-        // Instancia contrato
-        contract = new ethers.Contract(contractAddress, abi, signer);
+        const network = await provider.getNetwork();
+        console.log("Rede atual:", network);
 
-        // Habilita botões
+        // Contrato
+        const contractAddress = "0xe320ea0362bca5aF94EEB71Cc96661E3872e7838";
+        const abi = [
+          {
+            "inputs": [],
+            "name": "getStake",
+            "outputs": [{"internalType":"uint256","name":"","type":"uint256"}],
+            "stateMutability":"view",
+            "type":"function"
+          },
+          {
+            "inputs": [],
+            "name": "stake",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type":"function"
+          },
+          {
+            "inputs": [],
+            "name": "withdraw",
+            "outputs": [],
+            "stateMutability":"nonpayable",
+            "type":"function"
+          }
+        ];
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
         stakeButton.disabled = false;
         withdrawButton.disabled = false;
 
-        updateBalance();
+        // Lê saldo
+        try {
+          const stake = await contract.getStake();
+          balanceText.innerText = "Saldo: " + ethers.utils.formatEther(stake) + " ETH";
+        } catch(err) {
+          balanceText.innerText = "Saldo: erro ao ler";
+          console.error("Erro ao ler saldo:", err);
+        }
+
+        // Eventos dos botões
+        stakeButton.onclick = async () => {
+          try {
+            const tx = await contract.stake({ value: ethers.utils.parseEther("0.001") });
+            await tx.wait();
+            const stake = await contract.getStake();
+            balanceText.innerText = "Saldo: " + ethers.utils.formatEther(stake) + " ETH";
+          } catch(err) {
+            alert("Erro ao fazer stake: " + err.message);
+          }
+        };
+
+        withdrawButton.onclick = async () => {
+          try {
+            const tx = await contract.withdraw();
+            await tx.wait();
+            const stake = await contract.getStake();
+            balanceText.innerText = "Saldo: " + ethers.utils.formatEther(stake) + " ETH";
+          } catch(err) {
+            alert("Erro ao fazer withdraw: " + err.message);
+          }
+        };
+
       } catch (err) {
         walletAddress.innerText = "Erro ao conectar MetaMask: " + err.message;
         console.error(err);
         stakeButton.disabled = true;
         withdrawButton.disabled = true;
       }
-    }
-
-    async function stake() {
-      try {
-        const tx = await contract.stake({ value: ethers.utils.parseEther("0.001") });
-        await tx.wait();
-        updateBalance();
-      } catch (err) {
-        alert("Erro ao fazer stake: " + err.message);
-      }
-    }
-
-    async function withdraw() {
-      try {
-        const tx = await contract.withdraw();
-        await tx.wait();
-        updateBalance();
-      } catch (err) {
-        alert("Erro ao fazer withdraw: " + err.message);
-      }
-    }
-
-    async function updateBalance() {
-      try {
-        const balance = await contract.getStake();
-        balanceText.innerText = "Saldo: " + ethers.utils.formatEther(balance) + " ETH";
-      } catch (err) {
-        balanceText.innerText = "Saldo: erro ao ler";
-        console.error("Erro ao ler saldo:", err);
-      }
-    }
-
-    connectButton.onclick = connectWallet;
-    stakeButton.onclick = stake;
-    withdrawButton.onclick = withdraw;
+    };
   </script>
 </body>
 </html>

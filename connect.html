@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Teste Assinatura</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+</head>
+
+<body>
+
+<h2>Teste MetaMask</h2>
+
+<button onclick="connectWallet()">Conectar Carteira</button>
+
+<p id="wallet"></p>
+<p id="signature"></p>
+
+<script>
+
+async function connectWallet(){
+
+if(!window.ethereum){
+
+alert("MetaMask não encontrada")
+
+return
+
+}
+
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+
+await provider.send("eth_requestAccounts",[])
+
+const signer = provider.getSigner()
+
+const address = await signer.getAddress()
+
+document.getElementById("wallet").innerText = "Carteira: " + address
+
+// mensagem para assinatura
+
+const message = "Assinar mensagem para entrar no protocolo"
+
+// AQUI A METAMASK DEVE ABRIR
+
+const signature = await signer.signMessage(message)
+
+document.getElementById("signature").innerText = "Assinado com sucesso"
+
+console.log("Signature:",signature)
+
+}
+
+</script>
+
+</body>
+
+</html>

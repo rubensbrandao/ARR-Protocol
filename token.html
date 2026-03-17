@@ -95,20 +95,19 @@
       display:block;
     }
 
-    .brand-text h1{
-      margin:0;
-      font-size:30px;
-      font-weight:700;
-      letter-spacing:-0.5px;
-      color:white;
-      text-shadow:0 2px 10px rgba(0,0,0,0.28);
-    }
+    ..brand-text h1{
+  margin:0;
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:-0.5px;
+  color:#081020;
+}
 
-    .brand-text p{
-      margin:6px 0 0;
-      color:white;
-      text-shadow:0 2px 10px rgba(0,0,0,0.28);
-      font-size:14px;
+.brand-text p{
+  margin:6px 0 0;
+  color:#081020;
+  font-size:14px;
+}
     }
 
     .top-right{
@@ -783,10 +782,10 @@
             <select id="stakeToken">
               <option value="ARR">ARR</option>
             </select>
-            <img id="stakeTokenIcon" class="token-icon-preview" src="arr.svg" alt="">
+            <img id="stakeTokenIcon" class="token-icon-preview" src="arr.webp" alt="">
           </div>
           <div class="token-balance-line">
-            <img id="stakeBalanceIcon" src="arr.svg" alt="">
+            <img id="stakeBalanceIcon" src="arr.webp" alt="">
             <span id="stakeTokenBalanceText">Balance: -</span>
           </div>
         </div>
@@ -883,11 +882,11 @@
     /* ========= TOKEN LOGOS ========= */
     /* Se a pasta tokens der problema no seu host, joga na raiz e troca os caminhos aqui */
     const TOKEN_META = {
-      USDC: { symbol: "USDC", logo: "usdc.svg", balance: 0 },
-      USDT: { symbol: "USDT", logo: "usdt.svg", balance: 0 },
-      EURC: { symbol: "EURC", logo: "eurc.svg", balance: 0 },
-      ETH:  { symbol: "ETH",  logo: "eth.svg",  balance: 0 },
-      ARR:  { symbol: "ARR",  logo: "arr.svg",  balance: 0 }
+      USDC: { symbol: "USDC", logo: "usdc.webp", balance: 0 },
+      USDT: { symbol: "USDT", logo: "usdt.webp", balance: 0 },
+      EURC: { symbol: "EURC", logo: "eurc.webp", balance: 0 },
+      ETH:  { symbol: "ETH",  logo: "eth.webp",  balance: 0 },
+      ARR:  { symbol: "ARR",  logo: "arr.webp",  balance: 0 }
     };
 
     const ARR_PROTOCOL_ABI = [

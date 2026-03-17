@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Protocol | Simple, Fast and Deflationary</title>
+  <meta
+    name="description"
+    content="Simple, fast, and deflationary liquidity. Trade, farm, stake, and earn in one place."
+  />
+
+  <style>
+    :root {
+      --bg: #070f1d;
+      --bg-soft: rgba(255, 255, 255, 0.04);
+      --bg-card: rgba(255, 255, 255, 0.05);
+      --bg-card-hover: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.10);
+      --text: #f5f7fb;
+      --muted: #a8b3c7;
+      --accent: #7c5cff;
+      --accent-2: #35d7ff;
+      --success: #7ef0b8;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
+      --radius-sm: 16px;
+      --max: 1200px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 15, 29, 0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+      transition: 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 30px rgba(124, 92, 255, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background:
+        linear-gradient(to bottom, rgba(7, 15, 29, 0.28), rgba(7, 15, 29, 0.92)),
+        url("assets/bg-hero.webp") center/cover no-repeat;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top center, rgba(124, 92, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 20%, rgba(53, 215, 255, 0.12), transparent 24%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+      width: 100%;
+      padding: 100px 0 70px;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--success);
+      background: rgba(126, 240, 184, 0.08);
+      border: 1px solid rgba(126, 240, 184, 0.18);
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 76px);
+      line-height: 1.02;
+      letter-spacing: -1.6px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #ffffff, #9ddcff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2.2vw, 20px);
+      color: var(--muted);
+      max-width: 650px;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 14px;
+      max-width: 720px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero-card {
+      justify-self: end;
+      width: min(100%, 450px);
+      padding: 26px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hero-card-top h3 {
+      font-size: 20px;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.15);
+      border: 1px solid rgba(124, 92, 255, 0.24);
+      color: #d9d0ff;
+    }
+
+    .mini-panel {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 14px;
+    }
+
+    .mini-panel small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .mini-panel strong {
+      font-size: 18px;
+      display: block;
+    }
+
+    .supply-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* FEATURES */
+    .section-head {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 42px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.08;
+      margin-bottom: 14px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      position: relative;
+      min-height: 270px;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 0.28s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-card-hover);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 110px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, rgba(124,92,255,0.14), rgba(53,215,255,0.10));
+      border: 1px dashed rgba(255,255,255,0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* ABOUT / USE CASES */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .info-panel {
+      padding: 30px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .info-panel h2 {
+      font-size: clamp(28px, 3.5vw, 42px);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .info-panel p {
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-item {
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #dbe5f5;
+    }
+
+    /* FAQ */
+    .faq-list {
+      max-width: 920px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .faq-item {
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 24px;
+      font-weight: 700;
+      position: relative;
+      font-size: 17px;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary::after {
+      content: "+";
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: var(--accent-2);
+    }
+
+    .faq-item[open] summary::after {
+      content: "−";
+    }
+
+    .faq-content {
+      padding: 0 24px 22px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* CTA */
+    .cta-box {
+      padding: 40px;
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(124, 92, 255, 0.18), rgba(53, 215, 255, 0.10)),
+        rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-box h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      margin-bottom: 12px;
+      line-height: 1.08;
+    }
+
+    .cta-box p {
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto 24px;
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 36px 0 50px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.10);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-left p,
+    .footer-right a {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer-right a:hover {
+      color: var(--text);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .hero-inner,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        justify-self: start;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav-inner {
+        padding: 14px 0;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        background-position: center top;
+      }
+
+      .hero-inner {
+        padding: 72px 0 56px;
+      }
+
+      .hero h1 {
+        margin-bottom: 14px;
+      }
+
+      .hero p {
+        margin-bottom: 22px;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 64px 0;
+      }
+
+      .info-panel,
+      .cta-box {
+        padding: 24px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">
+          <img src="assets/logo.svg" alt="Protocol logo" />
+        </div>
+        <span>Your Protocol</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#token-utility">Utility</a>
+        <a href="#faq">FAQ</a>
+        <a href="token.html">Token</a>
+      </nav>
+
+      <a class="btn btn-primary" href="#start">Start Farming</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <span>●</span>
+          <span>Simple, fast and deflationary liquidity</span>
+        </div>
+
+        <h1>
+          Don’t just buy tokens.
+          <span>Farm, earn, and grow with the protocol.</span>
+        </h1>
+
+        <p>
+          Provide liquidity, stake your assets, and participate in a token economy
+          designed for utility, rewards, and long-term deflationary pressure.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#start" class="btn btn-primary">Start Farming</a>
+          <a href="token.html" class="btn btn-secondary">Learn About the Token</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <strong>Deflationary</strong>
+            <span>Designed to reward participation while reducing long-term supply pressure</span>
+          </div>
+          <div class="stat">
+            <strong>Fast Access</strong>
+            <span>Swap, farm, and provide liquidity in a simple user flow</span>
+          </div>
+          <div class="stat">
+            <strong>Real Utility</strong>
+            <span>Use the token across liquidity, staking, platform incentives, and governance</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <div class="hero-card-top">
+          <h3>Token Overview</h3>
+          <span class="badge">LP Rewards</span>
+        </div>
+
+        <div class="mini-panel">
+          <small>Total Supply</small>
+          <strong>1,000,000,000 TOKENS</strong>
+        </div>
+
+        <div class="mini-panel">
+          <small>Circulating Supply</small>
+          <strong>000,000,000 TOKENS</strong>
+        </div>
+
+        <div class="mini-panel">
+          <small>Main Utilities</small>
+          <strong>Liquidity • Farming • Staking • Platform Access</strong>
+        </div>
+
+        <p class="supply-note">
+          Replace these values with your real tokenomics. This card already
+          stays responsive and works well as a quick visual summary.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head">
+        <h2>Everything users need in one ecosystem</h2>
+        <p>
+          A cleaner way to trade, provide liquidity, earn rewards, and interact
+          with a token that actually has a purpose inside the platform.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="card-image">image placeholder 01</div>
+          <h3>Provide Liquidity</h3>
+          <p>
+            Deposit token pairs into liquidity pools and earn protocol fees while
+            supporting deeper market activity.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="card-image">image placeholder 02</div>
+          <h3>Farm Rewards</h3>
+          <p>
+            Use LP positions to farm additional rewards and maximize the
+            productive use of your capital.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="card-image">image placeholder 03</div>
+          <h3>Stake the Token</h3>
+          <p>
+            Lock your tokens to access platform benefits, reward streams, and
+            long-term ecosystem incentives.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="card-image">image placeholder 04</div>
+          <h3>Deflationary Mechanics</h3>
+          <p>
+            Built with a model that can reduce effective supply pressure through
+            protocol activity and token utility.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="card-image">image placeholder 05</div>
+          <h3>Simple User Experience</h3>
+          <p>
+            A streamlined interface designed to make farming, liquidity, and
+            token participation feel clear and accessible.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="card-image">image placeholder 06</div>
+          <h3>Protocol Utility</h3>
+          <p>
+            The token is not just for speculation. It powers actions, benefits,
+            incentives, and engagement inside the ecosystem.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKEN UTILITY -->
+  <section class="section" id="token-utility">
+    <div class="container split">
+      <div class="info-panel">
+        <h2>Why this token matters</h2>
+        <p>
+          Instead of being just another asset, the token is designed to work as
+          a core piece of the platform. It connects liquidity, rewards, staking,
+          and protocol participation.
+        </p>
+
+        <div class="check-list">
+          <div class="check-item">Use it to enter farms and access incentive opportunities</div>
+          <div class="check-item">Use it in liquidity pools to earn fees and additional rewards</div>
+          <div class="check-item">Stake it for ecosystem alignment and extra utility</div>
+          <div class="check-item">Benefit from a structure focused on long-term sustainability</div>
+        </div>
+      </div>
+
+      <div class="info-panel" id="start">
+        <h2>What users can do right now</h2>
+        <p>
+          This section can guide visitors into the platform and explain the most
+          important first steps in a simple, conversion-focused way.
+        </p>
+
+        <div class="check-list">
+          <div class="check-item">Step 1: Connect wallet</div>
+          <div class="check-item">Step 2: Buy or acquire the token</div>
+          <div class="check-item">Step 3: Provide liquidity or stake</div>
+          <div class="check-item">Step 4: Start farming and earning rewards</div>
+        </div>
+
+        <div style="margin-top: 22px;">
+          <a href="#" class="btn btn-primary">Launch App</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <h2>Frequently asked questions</h2>
+        <p>
+          You can edit these answers later with your exact tokenomics, APR data,
+          utility rules, and platform features.
+        </p>
+      </div>
+
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>What is the token used for?</summary>
+          <div class="faq-content">
+            The token is used across the platform for liquidity provision,
+            farming participation, staking opportunities, and other ecosystem
+            utilities that support long-term value and engagement.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How can I earn the token?</summary>
+          <div class="faq-content">
+            Users can earn the token by providing liquidity, participating in
+            farming programs, staking eligible assets, and interacting with
+            supported protocol features.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What makes the token deflationary?</summary>
+          <div class="faq-content">
+            The protocol is designed to introduce utility-driven demand and
+            mechanisms that can reduce sell pressure or circulating pressure over
+            time. Replace this paragraph later with your exact burn, fee, or
+            sink mechanics.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What is the total and circulating supply?</summary>
+          <div class="faq-content">
+            Total supply: <strong>1,000,000,000 TOKENS</strong><br />
+            Circulating supply: <strong>000,000,000 TOKENS</strong><br /><br />
+            Update these values with your live numbers.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How much can I earn by farming or staking?</summary>
+          <div class="faq-content">
+            Returns depend on the pool, total liquidity, reward emissions, and
+            the duration of participation. You can later replace this with a
+            real APR/APY range, such as “up to 24% APR” or similar.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What can I do inside the platform?</summary>
+          <div class="faq-content">
+            Inside the platform, users can connect a wallet, provide liquidity,
+            join farms, stake tokens, track rewards, and interact with token
+            utilities that support the broader ecosystem.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Start earning with simple, fast, and deflationary liquidity</h2>
+        <p>
+          Join the protocol, provide liquidity, put your tokens to work, and
+          participate in an ecosystem designed for long-term utility.
+        </p>
+
+        <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+          <a href="#" class="btn btn-primary">Start Farming Now</a>
+          <a href="token.html" class="btn btn-secondary">View Token Page</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <p>© 2026 Your Protocol. All rights reserved.</p>
+      </div>
+
+      <div class="footer-right">
+        <a href="https://x.com/" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+        <a href="https://t.me/" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a href="https://discord.com/" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

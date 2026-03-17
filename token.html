@@ -632,6 +632,10 @@
 
     const ARR_TOKEN_ADDRESS = "0x45e7042504b63435Fc215645bDb610Bec5387183";
     const ARR_VAULT_ADDRESS = "0x266F2800A0CCa0b118417F225a7b28551a6F8Cc0";
+    const ARR_PROTOCOL_ADDRESS = "0x505d906136cab0EEb11Fa8DCf0FedFC337d64f00";
+    const ARR_PROTOCOL_ABI = [
+  "function rewardUser(address user, uint256 volumeUSD) external"
+];
 
     const ARR_TOKEN_ABI = [
       {
@@ -682,6 +686,7 @@
     let userAddress = null;
     let arrTokenContract = null;
     let arrVaultContract = null;
+    let arrProtocolContract = null;
     let selectedPoolFee = "0.3%";
 
     const connectBtn = document.getElementById("connectBtn");
@@ -851,6 +856,11 @@
 
         arrTokenContract = new ethers.Contract(ARR_TOKEN_ADDRESS, ARR_TOKEN_ABI, signer);
         arrVaultContract = new ethers.Contract(ARR_VAULT_ADDRESS, ARR_VAULT_ABI, signer);
+        arrProtocolContract = new ethers.Contract(
+  ARR_PROTOCOL_ADDRESS,
+  ARR_PROTOCOL_ABI,
+  signer
+);
 
         signatureStatus.innerText = "Signature confirmed";
 
@@ -901,7 +911,7 @@
           return;
         }
 
-        if (!arrVaultContract || !userAddress) {
+        if (!arrProtocolContract || !userAddress) {
           swapStatus.className = "status err";
           swapStatus.innerText = "Connect your wallet first.";
           return;
@@ -910,17 +920,16 @@
         swapStatus.className = "status";
         swapStatus.innerText = "Preparing transaction...";
 
-        const reward = amount * 0.1;
-        const rewardWei = ethers.utils.parseEther(reward.toString());
-
-        const tx = await arrVaultContract.addReward(userAddress, rewardWei);
+        const volume = ethers.utils.parseUnits(amount.toString(), 18);
+        const tx = await arrProtocolContract.rewardUser(userAddress, volume);
+        
         swapStatus.innerText = "Waiting for confirmation in MetaMask...";
         await tx.wait();
 
         await refreshArrData();
 
         swapStatus.className = "status ok";
-        swapStatus.innerText = `Swap completed + ${reward.toFixed(4)} ARR earned 🚀`;
+        swapStatus.innerText = `Swap completed successfully 🚀`;
       } catch (err) {
         console.error("Swap error:", err);
         swapStatus.className = "status err";

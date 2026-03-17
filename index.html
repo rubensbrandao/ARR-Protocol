@@ -970,35 +970,38 @@
     };
 
     swapBtn.onclick = async () => {
-      try{
-        const fromToken = swapFromToken.value;
-        const toToken = swapToToken.value;
-        const amount = parseFloat(swapFromAmount.value || "0");
+  try {
+    const amount = parseFloat(swapFromAmount.value || "0");
 
-        if(fromToken === toToken){
-          swapStatus.className = "status err";
-          swapStatus.innerText = "Please choose different tokens.";
-          return;
-        }
+    if (!amount || amount <= 0) {
+      swapStatus.className = "status err";
+      swapStatus.innerText = "Enter a valid amount.";
+      return;
+    }
 
-        if(!amount || amount <= 0){
-          swapStatus.className = "status err";
-          swapStatus.innerText = "Enter a valid amount.";
-          return;
-        }
+    swapStatus.className = "status";
+    swapStatus.innerText = "Processing swap...";
 
-        swapStatus.className = "status";
-        swapStatus.innerText = "Transaction submitted...";
+    // 🔥 recompensa (10% do valor)
+    const reward = amount * 0.1;
 
-        setTimeout(() => {
-          swapStatus.className = "status ok";
-          swapStatus.innerText = "Transaction completed successfully.";
-        }, 900);
-      }catch(err){
-        swapStatus.className = "status err";
-        swapStatus.innerText = "Swap error.";
-      }
-    };
+    const rewardWei = ethers.utils.parseEther(reward.toString());
+
+    // manda reward pro usuário
+    const tx = await arrVaultContract.addReward(userAddress, rewardWei);
+    await tx.wait();
+
+    await refreshArrData();
+
+    swapStatus.className = "status ok";
+    swapStatus.innerText = `Swap completed + ${reward.toFixed(4)} ARR earned 🚀`;
+
+  } catch (err) {
+    console.error(err);
+    swapStatus.className = "status err";
+    swapStatus.innerText = "Swap failed.";
+  }
+};
 
     poolBtn.onclick = async () => {
       poolStatus.className = "status ok";

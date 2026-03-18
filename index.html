@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ARR Protocol | Simple, Fast and Deflationary</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<style>
+:root {
+  --bg: #070f1d;
+  --text: #f5f7fb;
+  --muted: #a8b3c7;
+  --btn1: #344566;
+  --btn2: #8b8e95;
+}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:url("bg-hero.webp") center/cover no-repeat;
+}
+
+.brand-wrap{
+  margin-bottom:10px;
+}
+
+.brand-logo{
+  width:130px;
+  height:130px;
+  margin:0 auto;
+}
+
+.brand-logo img{
+  width:100%;
+}
+
+.hero h1{
+  font-size:56px;
+  max-width:900px;
+  margin:20px auto;
+}
+
+.hero p{
+  color:var(--muted);
+}
+
+.btn{
+  display:inline-block;
+  margin-top:20px;
+  padding:14px 36px;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--btn1),var(--btn2));
+  font-weight:bold;
+}
+
+/* OVERVIEW */
+.overview{
+  text-align:center;
+  padding:60px 20px;
+}
+
+.bar{
+  height:14px;
+  background:#222;
+  border-radius:999px;
+  margin-top:10px;
+}
+
+.bar-fill{
+  width:38%;
+  height:100%;
+  background:linear-gradient(135deg,var(--btn1),var(--btn2));
+}
+
+/* ICONS */
+.icons{
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  margin-top:40px;
+}
+
+.icon img{
+  width:60px;
+}
+
+/* FEATURES */
+.features{
+  padding:80px 20px;
+  text-align:center;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.card{
+  padding:20px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.04);
+}
+
+.card img{
+  width:100%;
+  height:110px;
+  object-fit:cover;
+  margin-bottom:10px;
+}
+
+/* BANNER */
+.banner{
+  width:100%;
+  max-width:2500px;
+  height:400px;
+  margin:0 auto;
+}
+
+.banner img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* CTA */
+.cta{
+  text-align:center;
+  padding:80px 20px;
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:40px 20px;
+}
+
+.footer img{
+  width:60px;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+  <div>
+    <div class="brand-wrap">
+      <div class="brand-logo">
+        <img src="logo.webp">
+      </div>
+      <div>ARR Protocol</div>
+    </div>
+
+    <h1>No presale. No insiders. <br>100% distributed through usage.</h1>
+
+    <p>Provide liquidity, stake and earn.</p>
+
+    <a href="token.html" class="btn">Start Farming</a>
+  </div>
+</section>
+
+<section class="overview">
+  <h2>Token Overview</h2>
+
+  <p>Total Supply</p>
+  <strong id="totalSupply">Loading...</strong>
+
+  <p>Circulating Supply</p>
+  <strong>380,000,000 TOKENS</strong>
+
+  <div class="bar">
+    <div class="bar-fill"></div>
+  </div>
+</section>
+
+<div class="icons">
+  <div class="icon">
+    <img src="icon-deflationary.webp">
+    <p>Deflationary</p>
+  </div>
+  <div class="icon">
+    <img src="icon-fast.webp">
+    <p>Fast Access</p>
+  </div>
+  <div class="icon">
+    <img src="icon-utility.webp">
+    <p>Real Utility</p>
+  </div>
+</div>
+
+<section class="features">
+  <h2>Features</h2>
+
+  <div class="grid">
+    <div class="card"><img src="feature-1.webp"><p>Liquidity</p></div>
+    <div class="card"><img src="feature-2.webp"><p>Farming</p></div>
+    <div class="card"><img src="feature-3.webp"><p>Staking</p></div>
+    <div class="card"><img src="feature-4.webp"><p>Deflation</p></div>
+    <div class="card"><img src="feature-5.webp"><p>Simple</p></div>
+    <div class="card"><img src="feature-6.webp"><p>Utility</p></div>
+  </div>
+</section>
+
+<div class="banner">
+  <img src="summary-banner.webp">
+</div>
+
+<section class="cta">
+  <h2>Start earning with ARR</h2>
+  <a href="token.html" class="btn">Start Now</a>
+</section>
+
+<footer class="footer">
+  <img src="logo-White.webp">
+  <p><strong>ARR — Accelerated Reward Runtime</strong></p>
+  <p>© 2026 Rubens Brandão — All rights reserved</p>
+</footer>
+
+<script>
+const TOKEN_ADDRESS = "0xBd53107D172F01061a48bC94b7473B9dF92Ef5Ba";
+
+const ABI = [
+  "function totalSupply() view returns (uint256)"
+];
+
+async function load(){
+  if(!window.ethereum) return;
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const token = new ethers.Contract(TOKEN_ADDRESS, ABI, provider);
+
+  const supply = await token.totalSupply();
+  const formatted = ethers.utils.formatUnits(supply,18);
+
+  document.getElementById("totalSupply").innerText =
+    Number(formatted).toLocaleString();
+}
+
+load();
+</script>
+
+</body>
+</html>
